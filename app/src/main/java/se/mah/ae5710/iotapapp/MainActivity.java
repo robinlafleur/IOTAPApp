@@ -20,6 +20,7 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
     private Thread mConnectThread;
+    private Thread mConnectedThread;
     private BluetoothDevice mDevice;
 
     @Override
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
             if (pairedDevices.size() > 0) {
                 for (BluetoothDevice device : pairedDevices) {
                     mDevice = device;
+                    Log.i("Connected", "Connected");
                 }
                 mConnectThread = new ConnectThread(mDevice);
                 mConnectThread.start();
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
             mBluetoothAdapter.cancelDiscovery();
             try {
                 mmSocket.connect();
+                new ConnectedThread(mmSocket).start();
             } catch (IOException connectException) {
                 try {
                     mmSocket.close();
@@ -99,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
             while (true) {
                 try {
                     bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
+                    double in = mmInStream.read();
+                    Log.i(""+in,""+in);
                     for(int i = begin; i < bytes; i++) {
                         if(buffer[i] == "#".getBytes()[0]) {
                         mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();

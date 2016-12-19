@@ -20,4 +20,39 @@
         android:layout_marginLeft="46dp"
         android:layout_marginStart="46dp"
         android:id="@+id/textView" />
+    <TextView
+        android:id="@+id/txtString"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignLeft="@+id/testView1"
+        android:layout_alignParentBottom="true"
+        android:text=""
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/sensorView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sensorView0"
+        android:layout_centerHorizontal="true"
+        android:text="Y value = ?"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/sensorView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sensorView1"
+        android:layout_centerHorizontal="true"
+        android:text="Z value = ?"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/sensorView0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="196dp"
+        android:text="X value = ?"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 </RelativeLayout>
