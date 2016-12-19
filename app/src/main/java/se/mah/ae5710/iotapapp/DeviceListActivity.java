@@ -36,10 +36,8 @@ public class DeviceListActivity extends Activity {
     public void onResume()
     {
         super.onResume();
-        //***************
+
         checkBTState();
-
-
 
     }
 

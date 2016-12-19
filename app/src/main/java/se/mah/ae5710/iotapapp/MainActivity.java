@@ -22,43 +22,52 @@ public class MainActivity extends AppCompatActivity {
     private Thread mConnectThread;
     private Thread mConnectedThread;
     private BluetoothDevice mDevice;
+    TextView txtArduino, txtString, txtStringLength, sensorView0, sensorView1, sensorView2;
+    final int handlerState = 0;                         //used to identify handler message
+    private StringBuilder recDataString = new StringBuilder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (mBluetoothAdapter == null) {
-                // Device does not support Bluetooth
-                Log.i("No Bluetooth", "No bluetooth");
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+            Log.i("No Bluetooth", "No bluetooth");
+        }
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, 1);
+        }
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice device : pairedDevices) {
+                mDevice = device;
+                Log.i("Connected", "Connected");
             }
-            if (!mBluetoothAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, 1);
-            }
-            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-            if (pairedDevices.size() > 0) {
-                for (BluetoothDevice device : pairedDevices) {
-                    mDevice = device;
-                    Log.i("Connected", "Connected");
-                }
-                mConnectThread = new ConnectThread(mDevice);
-                mConnectThread.start();
-            }
+            mConnectThread = new ConnectThread(mDevice);
+            mConnectThread.start();
+            sensorView0 = (TextView) findViewById(R.id.sensorView0);
+            sensorView1 = (TextView) findViewById(R.id.sensorView1);
+            sensorView2 = (TextView) findViewById(R.id.sensorView2);
+        }
     }
 
     private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
         private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+
         public ConnectThread(BluetoothDevice device) {
             BluetoothSocket tmp = null;
             mmDevice = device;
             try {
                 tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-            } catch (IOException e) { }
+            } catch (IOException e) {
+            }
             mmSocket = tmp;
         }
+
         public void run() {
             mBluetoothAdapter.cancelDiscovery();
             try {
@@ -67,14 +76,17 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException connectException) {
                 try {
                     mmSocket.close();
-                } catch (IOException closeException) { }
+                } catch (IOException closeException) {
+                }
                 return;
             }
         }
+
         public void cancel() {
             try {
                 mmSocket.close();
-            } catch (IOException e) { }
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -82,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
             InputStream tmpIn = null;
@@ -98,18 +111,20 @@ public class MainActivity extends AppCompatActivity {
 
         public void run() {
             byte[] buffer = new byte[1024];
-            int begin = 0; int bytes = 0;
+            int begin = 0;
+            int bytes = 0;
             while (true) {
                 try {
                     bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
                     double in = mmInStream.read();
-                    Log.i(""+in,""+in);
-                    for(int i = begin; i < bytes; i++) {
-                        if(buffer[i] == "#".getBytes()[0]) {
-                        mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
-                        begin = i + 1;
-                            if(i == bytes - 1) {
-                                bytes = 0; begin = 0;
+                    Log.i("" + in, "" + in);
+                    for (int i = begin; i < bytes; i++) {
+                        if (buffer[i] == "#".getBytes()[0]) {
+                            mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+                            begin = i + 1;
+                            if (i == bytes - 1) {
+                                bytes = 0;
+                                begin = 0;
                             }
                         }
                     }
@@ -118,15 +133,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
         public void write(byte[] bytes) {
-            try { mmOutStream.write(bytes);
+            try {
+                mmOutStream.write(bytes);
             } catch (IOException e) {
 
             }
         }
 
         public void cancel() {
-            try { mmSocket.close();
+            try {
+                mmSocket.close();
             } catch (IOException e) {
 
             }
@@ -136,15 +154,47 @@ public class MainActivity extends AppCompatActivity {
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            byte[] writeBuf = (byte[]) msg.obj;
-            int begin = (int)msg.arg1;
-            int end = (int)msg.arg2;
-            switch(msg.what) {
-                case 1: String writeMessage = new String(writeBuf);
-                    writeMessage = writeMessage.substring(begin, end);
-                    break;
+//            byte[] writeBuf = (byte[]) msg.obj;
+//            int begin = (int)msg.arg1;
+//            int end = (int)msg.arg2;
+//            switch(msg.what) {
+//                case 1: String writeMessage = new String(writeBuf);
+//                    writeMessage = writeMessage.substring(begin, end);
+//                    break;
+//            }
+//        }
+            if (msg.what == handlerState) {                                        //if message is what we want
+                String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
+                recDataString.append(readMessage);                                    //keep appending to string until ~
+                int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
+                if (endOfLineIndex > 0) {                                           // make sure there data before ~
+                    String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
+                    txtString.setText("Data Received = " + dataInPrint);
+                    int dataLength = dataInPrint.length();                            //get length of data received
+                    txtStringLength.setText("String Length = " + String.valueOf(dataLength));
+
+                    if (recDataString.charAt(0) == '#')                                //if it starts with # we know it is what we are looking for
+                    {
+                        String sensor0 = recDataString.substring(1, 5);             //get sensor value from string between indices 1-5
+                        String sensor1 = recDataString.substring(6, 10);            //same again...
+                        String sensor2 = recDataString.substring(11, 15);
+
+                        sensorView0.setText(" X value = " + sensor0);    //update the textviews with sensor values
+                        sensorView1.setText(" Y value = " + sensor1);
+                        sensorView2.setText(" Z value = " + sensor2);
+
+                        Log.i(""+sensor0,""+sensor0);
+                        Log.i(""+sensor1,""+sensor1);
+                        Log.i(""+sensor2,""+sensor2);
+                    }
+                    recDataString.delete(0, recDataString.length());                    //clear all string data
+                    // strIncom =" ";
+                    dataInPrint = " ";
+                }
             }
         }
-    };
 
+        ;
+
+    };
 }
