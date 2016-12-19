@@ -19,10 +19,11 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter;
-    private Thread mConnectThread;
-    private Thread mConnectedThread;
+    public Thread mConnectThread;
+    public Thread mConnectedThread;
     private BluetoothDevice mDevice;
     TextView txtArduino, txtString, txtStringLength, sensorView0, sensorView1, sensorView2;
+    double in;
     final int handlerState = 0;                         //used to identify handler message
     private StringBuilder recDataString = new StringBuilder();
 
@@ -113,11 +114,20 @@ public class MainActivity extends AppCompatActivity {
             byte[] buffer = new byte[1024];
             int begin = 0;
             int bytes = 0;
+
             while (true) {
                 try {
                     bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
-                    double in = mmInStream.read();
-                    Log.i("" + in, "" + in);
+                    in = mmInStream.read();
+                    //Log.i("" + in, "" + in);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                                sensorView0.setText("X value = "+in);
+                        }
+                    });
+;
                     for (int i = begin; i < bytes; i++) {
                         if (buffer[i] == "#".getBytes()[0]) {
                             mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
@@ -154,47 +164,62 @@ public class MainActivity extends AppCompatActivity {
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-//            byte[] writeBuf = (byte[]) msg.obj;
-//            int begin = (int)msg.arg1;
-//            int end = (int)msg.arg2;
-//            switch(msg.what) {
-//                case 1: String writeMessage = new String(writeBuf);
-//                    writeMessage = writeMessage.substring(begin, end);
-//                    break;
-//            }
-//        }
-            if (msg.what == handlerState) {                                        //if message is what we want
-                String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
-                recDataString.append(readMessage);                                    //keep appending to string until ~
-                int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
-                if (endOfLineIndex > 0) {                                           // make sure there data before ~
-                    String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
-                    txtString.setText("Data Received = " + dataInPrint);
-                    int dataLength = dataInPrint.length();                            //get length of data received
-                    txtStringLength.setText("String Length = " + String.valueOf(dataLength));
-
-                    if (recDataString.charAt(0) == '#')                                //if it starts with # we know it is what we are looking for
-                    {
-                        String sensor0 = recDataString.substring(1, 5);             //get sensor value from string between indices 1-5
-                        String sensor1 = recDataString.substring(6, 10);            //same again...
-                        String sensor2 = recDataString.substring(11, 15);
-
-                        sensorView0.setText(" X value = " + sensor0);    //update the textviews with sensor values
-                        sensorView1.setText(" Y value = " + sensor1);
-                        sensorView2.setText(" Z value = " + sensor2);
-
-                        Log.i(""+sensor0,""+sensor0);
-                        Log.i(""+sensor1,""+sensor1);
-                        Log.i(""+sensor2,""+sensor2);
-                    }
-                    recDataString.delete(0, recDataString.length());                    //clear all string data
-                    // strIncom =" ";
-                    dataInPrint = " ";
-                }
+            byte[] writeBuf = (byte[]) msg.obj;
+            int begin = (int) msg.arg1;
+            int end = (int) msg.arg2;
+            switch (msg.what) {
+                case 1:
+                    String writeMessage = new String(writeBuf);
+                    writeMessage = writeMessage.substring(begin, end);
+                    String sensor0 = recDataString.substring(0, 5);
+                    String sensor1 = recDataString.substring(0, 5);
+                    String sensor2 = recDataString.substring(0, 5);
+                    Log.i(""+sensor0,""+sensor0);
+                    Log.i(""+sensor1,""+sensor1);
+                    Log.i(""+sensor2,""+sensor2);
+                    sensorView0.setText(" X value = " + sensor0);
+                    sensorView1.setText(" X value = " + sensor1);
+                    sensorView2.setText(" X value = " + sensor2);
+                    break;
             }
         }
 
         ;
-
     };
+
 }
+//            if (msg.what == handlerState) {                                        //if message is what we want
+//                String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
+//                recDataString.append(readMessage);                                    //keep appending to string until ~
+//                int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
+//                if (endOfLineIndex > 0) {                                           // make sure there data before ~
+//                    String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
+//                    txtString.setText("Data Received = " + dataInPrint);
+//                    int dataLength = dataInPrint.length();                            //get length of data received
+//                    txtStringLength.setText("String Length = " + String.valueOf(dataLength));
+//
+//                    if (recDataString.charAt(0) == '#')                                //if it starts with # we know it is what we are looking for
+//                    {
+//                        String sensor0 = recDataString.substring(1, 5);             //get sensor value from string between indices 1-5
+//                        String sensor1 = recDataString.substring(6, 10);            //same again...
+//                        String sensor2 = recDataString.substring(11, 15);
+//
+//                        sensorView0.setText(" X value = " + sensor0);    //update the textviews with sensor values
+//                        sensorView1.setText(" Y value = " + sensor1);
+//                        sensorView2.setText(" Z value = " + sensor2);
+//
+//                        Log.i(""+sensor0,""+sensor0);
+//                        Log.i(""+sensor1,""+sensor1);
+//                        Log.i(""+sensor2,""+sensor2);
+//                    }
+//                    recDataString.delete(0, recDataString.length());                    //clear all string data
+//                    // strIncom =" ";
+//                    dataInPrint = " ";
+//                }
+//            }
+//        }
+//
+//        ;
+//
+//    };
+//}
