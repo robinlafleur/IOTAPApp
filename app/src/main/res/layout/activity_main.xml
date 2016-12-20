@@ -55,30 +55,6 @@
         android:text="Z value = ?"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/sensorView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/sensorView2"
-        android:layout_centerHorizontal="true"
-        android:text="dX value = ?"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    <TextView
-        android:id="@+id/sensorView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/sensorView3"
-        android:layout_centerHorizontal="true"
-        android:text="dY value = ?"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/sensorView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/sensorView4"
-        android:layout_centerHorizontal="true"
-        android:text="dZ value = ?"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

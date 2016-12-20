@@ -22,11 +22,11 @@ public class MainActivity extends AppCompatActivity {
     public Thread mConnectThread;
     public Thread mConnectedThread;
     private BluetoothDevice mDevice;
-    TextView txtArduino, txtString, txtStringLength, sensorView0, sensorView1, sensorView2, sensorView3, sensorView4, sensorView5;
+    TextView txtArduino, txtString, txtStringLength, sensorView0, sensorView1, sensorView2;
     double in;
     String sensor0;
     String Recepcion;
-    String[] separated;
+    //String[] separated;
     final int handlerState = 0;                         //used to identify handler message
     private StringBuilder recDataString = new StringBuilder();
 
@@ -54,9 +54,6 @@ public class MainActivity extends AppCompatActivity {
             sensorView0 = (TextView) findViewById(R.id.sensorView0);
             sensorView1 = (TextView) findViewById(R.id.sensorView1);
             sensorView2 = (TextView) findViewById(R.id.sensorView2);
-            sensorView3 = (TextView) findViewById(R.id.sensorView3);
-            sensorView4 = (TextView) findViewById(R.id.sensorView4);
-            sensorView5 = (TextView) findViewById(R.id.sensorView5);
 
         }
     }
@@ -133,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                         for (i = 0; i < buffer2.length && buffer2[i] != 0; i++) {
                             String strInput = new String(buffer2, 0, i);
                             Recepcion = strInput;
-//                            separated = Recepcion.split(",");
+                            //separated = Recepcion.split(",");
                         }
 
                     }
@@ -145,16 +142,32 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            sensorView0.setText("X value = "+Recepcion);
+//                            if (Recepcion != null){
+//                            boolean completeSequence = true;
+//                            for (int i = 0 ; i > separated.length ; i++){
+//                                if (separated[i] == null){
+//                                    completeSequence = false;
+//                                }
+//                            }
+//                            if (completeSequence) {
+                              sensorView0.setText("X value = " + Recepcion);
 //                            sensorView0.setText("X value = "+separated[0]);
 //                            sensorView1.setText("Y value = "+separated[1]);
 //                            sensorView2.setText("Z value = "+separated[2]);
 //                            sensorView3.setText("dX value = "+separated[3]);
 //                            sensorView4.setText("dY value = "+separated[4]);
 //                            sensorView5.setText("dZ value = "+separated[5]);
-                                Log.i(""+Recepcion,""+Recepcion);
-                        }
-                    });
+                                Log.i("" + Recepcion, "" + Recepcion);
+//                            }
+//                                else {
+//                                Log.i("Error","Uncompleted Sequence");
+//                            }
+//
+//                        }
+//                            else {
+//                                Log.i("Reception empty","Reception empty");                          }
+//                        }}
+                    }});
 ;
                     for (int i = begin; i < bytes; i++) {
                         if (buffer[i] == "#".getBytes()[0]) {
