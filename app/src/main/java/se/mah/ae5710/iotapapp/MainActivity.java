@@ -25,8 +25,8 @@ public class MainActivity extends AppCompatActivity {
     TextView txtArduino, txtString, txtStringLength, sensorView0, sensorView1, sensorView2, sensorView3, sensorView4, sensorView5;
     double in;
     String sensor0;
-    String Recepcion;
-    String[] separated;
+    String Reception;
+    String[] separated = new String[10000];
     final int handlerState = 0;                         //used to identify handler message
     private StringBuilder recDataString = new StringBuilder();
 
@@ -130,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
                         inputStream.read(buffer2);
                         for (int i = 0; i < buffer2.length && buffer2[i] != 0; i++) {
                             String strInput = new String(buffer2, 0, i);
-                            Recepcion = strInput;
-                            separated = Recepcion.split(",");
+                            Reception = strInput;
+                            separated = Reception.split(",");
                         }
                         try {
                             sleep(1000);
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (Recepcion != null){
+                            if (Reception != null){
                             boolean completeSequence = true;
                             for (int i = 0 ; i > separated.length ; i++){
                                 if (separated[i] == null){
@@ -156,14 +156,14 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                             if (completeSequence) {
-//                              sensorView0.setText("X value = " + Recepcion);
+//                              sensorView0.setText("X value = " + Reception);
                             sensorView0.setText("X value = "+separated[1]);
                             sensorView1.setText("Y value = "+separated[2]);
                             sensorView2.setText("Z value = "+separated[3]);
-//                            sensorView3.setText("dX value = "+separated[4]);
-//                            sensorView4.setText("dY value = "+separated[5]);
-//                            sensorView5.setText("dZ value = "+separated[6]);
-                                Log.i("", "" + Recepcion);
+                            sensorView3.setText("dX value = "+separated[4]);
+                            sensorView4.setText("dY value = "+separated[5]);
+                            sensorView5.setText("dZ value = "+separated[6]);
+                                Log.i("", "" + Reception);
 //                                Log.i("", "" + separated[1]);
 
                             }
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
 //
                         }
                             else {
-                                Log.i("Reception empty","Reception empty");
+                                Log.i("Error","Reception empty");
                             }
                         }});
 ;
