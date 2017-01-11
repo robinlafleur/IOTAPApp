@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     inputStream = mmSocket.getInputStream();
                     byte[] buffer2 = new byte[256];
-                    if (inputStream.available() > 0){
+                    if (inputStream.available() > 0) {
                         inputStream.read(buffer2);
                         for (int i = 0; i < buffer2.length && buffer2[i] != 0; i++) {
                             String strInput = new String(buffer2, 0, i);
@@ -135,48 +135,40 @@ public class MainActivity extends AppCompatActivity {
                         }
                         try {
                             sleep(1000);
-                        }
-                        catch (InterruptedException ie) {
+                        } catch (InterruptedException ie) {
                         }
 
                     }
-//                    bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
-//                    in = mmInStream.read();
-//                    Log.i("" + in, "" + in);
-                    //sensor0 = recDataString.substring(0, 5);
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (Reception != null){
-                            boolean completeSequence = true;
-                            for (int i = 0 ; i > separated.length ; i++){
-                                if (separated[i] == null){
-                                    completeSequence = false;
+                            if (Reception != null) {
+                                boolean completeSequence = true;
+                                for (int i = 0; i > separated.length; i++) {
+                                    if (separated[i] == null) {
+                                        completeSequence = false;
+                                    }
                                 }
-                            }
-                            if (completeSequence) {
+                                if (completeSequence) {
 //                              sensorView0.setText("X value = " + Reception);
-                            sensorView0.setText("X value = "+separated[1]);
-                            sensorView1.setText("Y value = "+separated[2]);
-                            sensorView2.setText("Z value = "+separated[3]);
-                            sensorView3.setText("dX value = "+separated[4]);
-                            sensorView4.setText("dY value = "+separated[5]);
-                            sensorView5.setText("dZ value = "+separated[6]);
-                                Log.i("", "" + Reception);
-//                                Log.i("", "" + separated[1]);
+                                    sensorView0.setText("X value = " + separated[1]);
+                                    sensorView1.setText("Y value = " + separated[2]);
+                                    sensorView2.setText("Z value = " + separated[3]);
+                                    sensorView3.setText("dX value = " + separated[4]);
+                                    sensorView4.setText("dY value = " + separated[5]);
+                                    sensorView5.setText("dZ value = " + separated[6]);
 
-                            }
-                                else {
-                                Log.i("Error","Uncompleted Sequence");
-                            }
+                                } else {
+                                    Log.i("Error", "Uncomplete Sequence");
+                                }
 //
-                        }
-                            else {
-                                Log.i("Error","Reception empty");
+                            } else {
+                                Log.i("Error", "Reception empty");
                             }
-                        }});
-;
+                        }
+                    });
+                    ;
                     for (int i = begin; i < bytes; i++) {
                         if (buffer[i] == "#".getBytes()[0]) {
                             mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
@@ -214,8 +206,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             byte[] writeBuf = (byte[]) msg.obj;
-            int begin = (int) msg.arg1;
-            int end = (int) msg.arg2;
+            int begin = msg.arg1;
+            int end = msg.arg2;
             switch (msg.what) {
                 case 1:
                     String writeMessage = new String(writeBuf);
@@ -228,38 +220,3 @@ public class MainActivity extends AppCompatActivity {
     };
 
 }
-//            if (msg.what == handlerState) {                                        //if message is what we want
-//                String readMessage = (String) msg.obj;                                                                // msg.arg1 = bytes from connect thread
-//                recDataString.append(readMessage);                                    //keep appending to string until ~
-//                int endOfLineIndex = recDataString.indexOf("~");                    // determine the end-of-line
-//                if (endOfLineIndex > 0) {                                           // make sure there data before ~
-//                    String dataInPrint = recDataString.substring(0, endOfLineIndex);    // extract string
-//                    txtString.setText("Data Received = " + dataInPrint);
-//                    int dataLength = dataInPrint.length();                            //get length of data received
-//                    txtStringLength.setText("String Length = " + String.valueOf(dataLength));
-//
-//                    if (recDataString.charAt(0) == '#')                                //if it starts with # we know it is what we are looking for
-//                    {
-//                        String sensor0 = recDataString.substring(1, 5);             //get sensor value from string between indices 1-5
-//                        String sensor1 = recDataString.substring(6, 10);            //same again...
-//                        String sensor2 = recDataString.substring(11, 15);
-//
-//                        sensorView0.setText(" X value = " + sensor0);    //update the textviews with sensor values
-//                        sensorView1.setText(" Y value = " + sensor1);
-//                        sensorView2.setText(" Z value = " + sensor2);
-//
-//                        Log.i(""+sensor0,""+sensor0);
-//                        Log.i(""+sensor1,""+sensor1);
-//                        Log.i(""+sensor2,""+sensor2);
-//                    }
-//                    recDataString.delete(0, recDataString.length());                    //clear all string data
-//                    // strIncom =" ";
-//                    dataInPrint = " ";
-//                }
-//            }
-//        }
-//
-//        ;
-//
-//    };
-//}
